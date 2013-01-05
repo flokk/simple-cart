@@ -1,7 +1,7 @@
 var should = require("should"),
     request = require("supertest"),
     url = require("url"),
-    app = require("../index")();
+    app = require("..")();
 
 describe("app", function() {
 
