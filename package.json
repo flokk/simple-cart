@@ -1,0 +1,22 @@
+{
+  "name": "simple-cart",
+  "version": "0.0.1",
+  "description": "Simple, hypermedia driven shopping cart API.",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODE_ENV=test mocha -R spec"
+  },
+  "repository": "",
+  "author": "Cameron Bytheway <cameron@nujii.com>",
+  "license": "MIT",
+  "dependencies": {
+    "simple-db": "~0.0.1",
+    "express": "~3.0.5",
+    "node-uuid": "~1.4.0"
+  },
+  "devDependencies": {
+    "should": "~1.2.1",
+    "supertest": "~0.5.1",
+    "mocha": "~1.7.4"
+  }
+}
