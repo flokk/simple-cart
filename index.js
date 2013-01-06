@@ -4,6 +4,7 @@
  */
 
 var express = require('express')
+  , pack = require('simple-stack')
   , root = require('./routes')
   , cart = require('./routes/cart');
 
@@ -11,23 +12,18 @@ module.exports = function create(options) {
   if (!options) options = {};
 
   var app = express();
+  var stack = pack({router: app.router});
 
   app.configure(function(){
     app.set("x-powered-by", false);
-    app.use(function fqdn(req, res, next) {
-      req.fqdn = req.protocol+"://"+req.headers.host;
-      next();
-    });
-    app.use(express.favicon());
-    if(app.settings.env !== "test") app.use(express.logger('dev'));
-    app.use(express.bodyParser());
-    app.use(express.methodOverride());
-    if(options.auth) app.use(options.auth);
-    app.use(app.router);
+    app.use(stack);
   });
 
   app.configure('development', function(){
     app.use(express.errorHandler());
+  });
+  app.configure('test', function(){
+    stack.remove("logger");
   });
 
   app.get('/', root.index);

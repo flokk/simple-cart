@@ -6,11 +6,16 @@
   "scripts": {
     "test": "NODE_ENV=test mocha -R spec"
   },
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CamShaft/simple-cart.git"
+  },
   "author": "Cameron Bytheway <cameron@nujii.com>",
   "license": "MIT",
+  "readmeFilename": "README.md",
   "dependencies": {
     "simple-db": "~0.0.1",
+    "simple-stack": "~0.0.1",
     "express": "~3.0.5",
     "node-uuid": "~1.4.0"
   },
