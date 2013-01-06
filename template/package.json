@@ -1,0 +1,20 @@
+{
+  "name":        "hosted-simple-cart",
+  "version":     "1.0.0",
+  "keywords":    "",
+  "description": "",
+  "license":     "MIT",
+  "scripts": {
+    "start": "node_modules/.bin/startup start",
+    "middlware": "node_modules/.bin/startup middlware",
+    "routes": "node_modules/.bin/startup routes",
+    "settings": "node_modules/.bin/startup settings"
+  },
+  "dependencies": {
+    "simple-cart": "~0.0.1",
+    "startup": "~0.0.1"
+  },
+  "engines": {
+    "node": "0.8.x"
+  }
+}
