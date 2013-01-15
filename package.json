@@ -1,6 +1,6 @@
 {
   "name": "simple-cart",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Simple, hypermedia driven shopping cart API.",
   "main": "index.js",
   "scripts": {
@@ -15,9 +15,9 @@
   "readmeFilename": "README.md",
   "dependencies": {
     "simple-db": "~0.0.1",
-    "simple-stack": "~0.0.1",
-    "express": "~3.0.5",
-    "node-uuid": "~1.4.0"
+    "node-uuid": "~1.4.0",
+    "simple-stack": "0.1.0",
+    "http-error": "0.0.1"
   },
   "devDependencies": {
     "should": "~1.2.1",

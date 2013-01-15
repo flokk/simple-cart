@@ -3,22 +3,26 @@
  * cart.
  */
 
-var db = require("simple-db");
+var db = require("simple-db"),
+    url = require("url"),
+    E = require("http-error");
 
 exports.create = function(req, res, next){
-  if (req.body && req.body.user) {
+  if (req.body && req.body.user && req.body.user.value) {
 
-    db.post("carts", {user: req.body.user}, function(err, cartID) {
+    db.post("carts", {user: req.body.user.value}, function(err, cartID) {
       if (err) return next(err);
 
-      db.put("index", req.body.user, cartID, function(err) {
+      db.put("index", req.body.user.value, cartID, function(err) {
         if (err) return next(err);
 
         res.set("location", "/carts/"+cartID);
         res.send(303);
       });
     });
-    // Index the cart by user
+  }
+  else {
+    next(new E.BadRequest("Cart must have a user"));
   }
 };
 
@@ -26,19 +30,31 @@ exports.get = function(req, res, next){
   var cartID = req.params.id;
   db.get("carts", cartID, function(err, cart) {
     if (err) return next(err);
-    if (!cart) return next(new Error("Cart not found"));
+    // Pass it on to the notFound middleware
+    if (!cart) return next();
 
-    res.send(renderGetRes(req.fqdn, cartID, cart));
+    res.send(renderGetRes(req.base, cartID, cart));
   });
 };
 
-exports.edit = function(req, res){
+exports.edit = function(req, res, next){
   var cartID = req.params.id;
   db.get("carts", cartID, function(err, cart) {
     if (err) return next(err);
-    if (!cart) return next(new Error("Cart not found"));
+    if (!cart) return next();
 
-    // TODO validate
+    if (!req.body.item || !req.body.item.value) {
+      return next(new E.BadRequest("Item field needs to be filled out"));
+    }
+    else {
+      var itemHref = url.parse(req.body.item.value);
+      if (!itemHref.path) {
+        return next(new E.BadRequest("Item field needs to be filled out"));
+      }
+    }
+    if (!req.body.quantity || !req.body.quantity.value) {
+      return next(new E.BadRequest("Quantity field needs to be filled out"));
+    }
 
     var commit = {
       href: req.body.item.value,
@@ -82,7 +98,7 @@ exports.edit = function(req, res){
       return db.put("carts", cartID, cart, function(err) {
         if (err) return next(err);
 
-        res.send(renderGetRes(req.fqdn, cartID, cart));
+        res.send(renderGetRes(req.base, cartID, cart));
         res.send(203);
       });
 
@@ -92,11 +108,11 @@ exports.edit = function(req, res){
 };
 
 
-var renderGetRes = function(fqdn, cartID, cart) {
+var renderGetRes = function(base, cartID, cart) {
   var response = {
     _links: {
-      self: {href: fqdn+"/carts/"+cartID},
-      history: {href: fqdn+"/carts/"+cartID+"/history"},
+      self: {href: base+"/carts/"+cartID},
+      history: {href: base+"/carts/"+cartID+"/history"},
       user: {href: cart.user}
     },
     // Is this redundant...?
@@ -105,7 +121,7 @@ var renderGetRes = function(fqdn, cartID, cart) {
       items: []
     },
     _templates: {
-      add: {target: fqdn+"/carts/"+cartID+"/history", method: "post", form: {
+      add: {action: base+"/carts/"+cartID+"/history", method: "post", form: {
         item: {value: "", prompt: "Item"},
         quantity: {value: 1, prompt: "Quantity"}
       }}
@@ -119,11 +135,11 @@ var renderGetRes = function(fqdn, cartID, cart) {
         },
         quantity: item.quantity,
         _templates: {
-          update: {target: fqdn+"/carts/"+cartID+"/history", method: "post", form: {
+          update: {action: base+"/carts/"+cartID+"/history", method: "post", form: {
             item: {value: item.href},
             quantity: {value: item.quantity, prompt: "Quantity"}
           }},
-          remove: {target: fqdn+"/carts/"+cartID+"/history", method: "post", form: {
+          remove: {action: base+"/carts/"+cartID+"/history", method: "post", form: {
             item: {value: item.href},
             quantity: {value: 0}
           }}
